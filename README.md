@@ -1,6 +1,6 @@
 # **Descripcion:**
 Este proyecto consiste en el desarrollo de un sensor remotamente programable mediante el uso de MicroPython y un microcontrolador de la familia ESP32. Cada carpeta cuenta con un ejemplo del funcionamiento de algún sensor con el microcontrolador.
-**Contenidos:**
+# **Contenidos:**
 * Battery: Pruebas para el módulo AXP2101 de energía como la medicion de la bateria restante
 * bots: Bots simples para la comunicación con el protocolo MQTT
 * Co2: Utilizacion de un sensor Co2 con I2C
