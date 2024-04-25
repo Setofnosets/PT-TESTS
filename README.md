@@ -15,3 +15,4 @@ Este proyecto consiste en el desarrollo de un sensor remotamente programable med
  *  ReloadWebREPL: Demostración de WebREPL donde el procesamiento de realiza en un módulo que periodicamente se vuelve a cargar, si se reemplaza el archivo del módulo, el programa carga el nuevo archivo y el comportamiento cambia
  *  TCPSockets: Actualización del dispositivo mediante mensajes transmitidos por una conexión con sockets TCP
  *  UpdateTempTime: Demostración sockets para cambiar el intervalo de medición del módulo DHT11
+* UseCases: Demostración de posibles casos de uso del sensor, permite alternar entre medir temperatura y humedad e información geográfica, adicionalmente, permite modificar que sentencia NMEA mostrará 
