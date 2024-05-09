@@ -164,9 +164,9 @@ def evaluate_conditions(active_conditions):
     for condition in active_conditions:
         if condition == 'Ubicacion modificada':
             return conditions[condition](pastLatitude, latitude)
-        elif condition == 'Tiempo de respuesta excedido':
+        if condition == 'Tiempo de respuesta excedido':
             return conditions[condition](timeout)
-        elif condition == 'Temperatura fuera de rango':
+        if condition == 'Temperatura fuera de rango':
             return conditions[condition](temp)
     return False
 
