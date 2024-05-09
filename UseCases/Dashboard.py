@@ -62,6 +62,15 @@ def main():
             command = command+','+network+','+password
             sendCommand(s, command)
         elif command == '5':
+            #Condiciones
+            print("Condicionales:")
+            print("1. Ubicación")
+            print("2. Timeout")
+            print("3. Temperatura")
+            condicional = input("Ingrese el condicional: ")
+            condicional = command+','+condicional
+            sendCommand(s, condicional)
+        elif command == '6':
             sendCommand(s, command)
             break
     s.close()

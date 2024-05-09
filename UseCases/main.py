@@ -25,6 +25,7 @@ buffer = bytearray(255)
 TIMEOUT = False
 FIX_STATUS = False
 
+timeout = 20
 gps_measure = "b'$GPGGA"
 latitude = ""
 longitude = ""
@@ -32,6 +33,15 @@ satellites = ""
 GPStime = ""
 info = ""
 stolen = False
+
+# Condiciones Anormales
+conditions = {
+    'Ubicacion modificada': lambda x, y: abs(x - y) > 0.001,
+    'Tiempo de respuesta excedido': lambda x: time.time() > x,
+    'Temperatura fuera de rango': lambda x: x < 0 or x > 50
+}
+
+active_conditions = [] # Default
 
 def do_connect(network_name='INFINITUMFE9D_2.4', network_password='u5YK4Z49Rt'):
     oled = screen()
@@ -144,11 +154,21 @@ def display_mode(oled, mode, info):
             oled.text(data[i], 0, i*10)
     oled.show()
 
-def measures():
+def measures(mode):
     if mode == 1:
         return measure_temp()
     elif mode == 2:
         return getGPS(gps, gps_measure)
+
+def evaluate_conditions(active_conditions):
+    for condition in active_conditions:
+        if condition == 'Ubicacion modificada':
+            return conditions[condition](pastLatitude, latitude)
+        elif condition == 'Tiempo de respuesta excedido':
+            return conditions[condition](timeout)
+        elif condition == 'Temperatura fuera de rango':
+            return conditions[condition](temp)
+    return False
 
 oled = screen()
 
@@ -184,10 +204,13 @@ while True:
         if not c:
             pastLatitude = latitude
             pastLongitude = longitude
-            info = measures()
-            if (abs(pastLatitude - latitude) > 0.001 or abs(pastLongitude - longitude) > 0.001):
-                print("Ubicación modificada")
+            info = measures(mode)
+
+            if evaluate_conditions(active_conditions):
+                print("Condiciones anormales detectadas")
                 stolen = True
+                continue
+
             print(info)
             display_mode(oled, mode, info)
 
@@ -201,17 +224,18 @@ while True:
             # Poll and wait for specified time
             y = poller.poll(measure_interval * 1000)
             if stolen:
-                mssg = "Stolen: " + info + "\nDate: " + str(time.localtime())
+                mssg = "Condicion anormal: " + info + "\nDate: " + str(time.localtime()) + "\nCondition: " + str(active_conditions)
                 c.send(mssg.encode())
                 stolen = False
             # If no data is received, measure temperature, humidity and GPS data
             if not y:
                 pastLatitude = latitude
                 pastLongitude = longitude
-                info = measures()
-                if (abs(pastLatitude - latitude) > 0.001 or abs(pastLongitude - longitude) > 0.001):
-                    print("Ubicación modificada")
+                info = measures(mode)
+                if evaluate_conditions(active_conditions):
+                    print("Condiciones anormales detectadas")
                     stolen = True
+                    continue
                 print(info)
                 display_mode(oled, mode, info)
                 continue
@@ -234,6 +258,10 @@ while True:
                     continue
                 elif x[0] == "2":
                     # Modificar formato de salida GPS
+                    # b'$GPGGA: Latitud, Longitud, Satélites, Hora
+                    # b'$GPVTG: Velocidad, Rumbo
+                    # b'$GPGSV: Satélites visibles
+                    # b'$GPRMC: Hora, Latitud, Longitud, Velocidad
                     gps_measure = x[1]
                     print("New GPS format: " + gps_measure)
                     continue
@@ -253,11 +281,24 @@ while True:
                     print("New password: " + password)
                     do_connect(network, password)
                     continue
-                if x[0] == "5":
+                elif x[0] == "5":
+                    # Condiciones
+                    # 1. Ubicación
+                    # 2. Timeout
+                    # 3. Temperatura
+                    condition = x[1]
+                    if condition == "1":
+                        active_conditions.append('Ubicacion modificada')
+                    elif condition == "2":
+                        active_conditions.append('Tiempo de respuesta excedido')
+                    elif condition == "3":
+                        active_conditions.append('Temperatura fuera de rango')
+                    print("New condition: " + condition)
+                if x[0] == "6":
                     c = None
                     continue
                 else:
-                    info = measures()
+                    info = measures(mode)
                     display_mode(oled, mode, info)
                     continue
                 FIX_STATUS = False
