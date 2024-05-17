@@ -3,7 +3,6 @@ import ssd1306
 import time, utime
 from AXP2101 import *
 
-
 SCL = 22
 SDA = 21
 IRQ = 35

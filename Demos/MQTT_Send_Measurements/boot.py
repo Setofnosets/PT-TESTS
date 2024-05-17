@@ -7,6 +7,9 @@ import network
 SCL = 22
 SDA = 21
 
+# Baud rate
+baud_rate = 115200
+
 def screen():
     oled_width = 128
     oled_height = 64

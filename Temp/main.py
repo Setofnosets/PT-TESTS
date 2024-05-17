@@ -15,7 +15,6 @@ def screen():
     i2c = SoftI2C(scl=Pin(SCL), sda=Pin(SDA), freq=10000)
     oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
     oled.fill(0)
-    oled.text('Connecting...', 0, 0)
     return oled
 
 oled = screen()
